@@ -1,6 +1,7 @@
 import Sensor from "./Sensor";
 
 export default class SensorHandler{
+
     private static instance: SensorHandler;
     private catagories: Map<string, Sensor>;
 
@@ -14,5 +15,10 @@ export default class SensorHandler{
         return this.instance;
     }
     
-    
+    public getAll(){
+        return Array.from(this.catagories);
+    }
+    public get(catagory: string) : Sensor {
+        return this.catagories.get(catagory);
+    }
 }
