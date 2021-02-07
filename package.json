@@ -1,0 +1,27 @@
+{
+  "name": "zenvision-api",
+  "version": "1.0.0",
+  "description": "Zen-visoin is an api that fetches data from a fibaro sensor suit for educational presuit.",
+  "main": "index.js",
+  "scripts": {
+    "test": "dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EmilyBjartskular/ZenVision-API.git"
+  },
+  "keywords": [
+    "AR"
+  ],
+  "author": "ojaohe-3, Johan Rodahl Holmgren, ojaohe-3@student.ltu.se",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EmilyBjartskular/ZenVision-API/issues"
+  },
+  "homepage": "https://github.com/EmilyBjartskular/ZenVision-API#readme",
+  "dependencies": {
+    "@types/express": "^4.17.11",
+    "express": "^4.17.1",
+    "typescript": "^4.1.3"
+  }
+}
