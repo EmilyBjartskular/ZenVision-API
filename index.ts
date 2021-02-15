@@ -1,4 +1,4 @@
-import express = require("express");
+import express from "express";
 import SensorHandler from "./SensorHandler";
 
 const app: express.Application = express();
@@ -23,4 +23,16 @@ app.get("/api/:catg", (req, res) => {
         res.status(404).send("not a valid entry!")
 });
 
-//todo add single instance of an catagory
+app.get("/api/:catg/:did", (req, res) => { 
+    const catagory = req.params.catg;
+    const deviceId = req.params.did;
+
+    const entry = SensorHandler.Instance.getFromId(catagory, deviceId);
+    if(entry){
+        res.json(entry); 
+    }else
+        res.status(404).send("not a valid entry!")
+});
+
+//data monitor
+//todo error messages.
