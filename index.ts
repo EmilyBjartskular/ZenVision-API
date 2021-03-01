@@ -1,5 +1,5 @@
 import express from "express";
-import SensorHandler from "./SensorHandler";
+import SensorHandler from "./Sensors/SensorHandler";
 
 const app: express.Application = express();
 
