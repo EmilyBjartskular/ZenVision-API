@@ -1,29 +1,41 @@
 import Sensor from "./Sensor";
 
-export default class SensorHandler{
+export default class SensorHandler {
 
 
-    private static instance: SensorHandler;
-    private catagories: Map<string, Array<Sensor>>;
+    private static instance : SensorHandler;
+    private sensors : Map < string,
+    Sensor >;
 
-    constructor(){
-        this.catagories = new Map<string, Array<Sensor>>();
+    constructor() {
+        this.sensors = new Map<string, Sensor>();
     }
 
-    public static get Instance(){
-        if(!this.instance)
+    public static get Instance() {
+        if (!this.instance) 
             this.instance = new SensorHandler();
+        
+
         return this.instance;
     }
+
+    public getAll() {
+        return Array.from(this.sensors);
+    }
+    public get(id : string): Sensor {
+        return this.sensors.get(id);
+    }
     
-    public getAll(){
-        return Array.from(this.catagories);
+    // public getFromId(catagory : string, deviceId : number) {
+    //     const entrys = this.catagories.get(catagory);
+    //     return entrys.find((sensor) => sensor.id === deviceId);
+    // }
+
+    public pushItem(id : string, item : Sensor) {
+        this.sensors.set(id, item);
     }
-    public get(catagory: string) : Array<Sensor> {
-        return this.catagories.get(catagory);
-    }
-    public getFromId(catagory: string, deviceId: string) {
-        const entrys = this.catagories.get(catagory);
-        return entrys.find((sensor)=>sensor.Device_id === deviceId);
+    public updatetem(id : string, item : Sensor) {
+        if(this.sensors.has(id))
+            this.sensors.set(id, item);
     }
 }

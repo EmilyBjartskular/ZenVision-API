@@ -1,7 +1,7 @@
-import express from "express";
 import SensorHandler from "./Sensors/SensorHandler";
+const express = require("express");
 
-const app: express.Application = express();
+const app = express();
 
 app.use(express.json());
 let logger = (req, res, next) =>{ 
@@ -14,25 +14,16 @@ app.get("/api/", (req, res) => {
     res.json(SensorHandler.Instance.getAll())
 });
 
-app.get("/api/:catg", (req, res) => {
-    const catagory = req.params.catg;
-    const entry = SensorHandler.Instance.get(catagory);
+app.get("/api/:id", (req, res) => {
+    const id = req.params.id;
+    const entry = SensorHandler.Instance.get(id);
     if(entry){
         res.json(entry); 
     }else
         res.status(404).send("not a valid entry!")
 });
 
-app.get("/api/:catg/:did", (req, res) => { 
-    const catagory = req.params.catg;
-    const deviceId = req.params.did;
 
-    const entry = SensorHandler.Instance.getFromId(catagory, deviceId);
-    if(entry){
-        res.json(entry); 
-    }else
-        res.status(404).send("not a valid entry!")
-});
 
 //data monitor
 //todo error messages.
