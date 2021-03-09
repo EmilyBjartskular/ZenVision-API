@@ -24,6 +24,3 @@ app.get("/api/:id", (req, res) => {
 });
 
 
-
-//data monitor
-//todo error messages.
