@@ -1,4 +1,3 @@
-import Sensor from "./Sensors/Sensor";
 
 export default interface Work {
     id: string;
