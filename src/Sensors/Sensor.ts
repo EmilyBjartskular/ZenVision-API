@@ -44,7 +44,7 @@ declare interface Properties { //fibaro property
     useTemplate?: string,
     value: string
 }
-export default interface Sensor { 
+export default interface Sensor { //fibaro hc3 sensor standard
     id: number,
     name: string,
     roomID: number,

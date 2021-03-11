@@ -14,6 +14,7 @@ dotenv.config();
 const app = Express();
 
 DeviceHandler.Instance.ItemsAvailable.on("update", Workload.Instance.process); //whenever the device handler pushes new changes update the process queue of the workload
+DeviceHandler.Instance.fetchAll();
 
 app.use(Express.json());
 app.use(cors());
@@ -39,7 +40,6 @@ app.get("/api/select/:id", (req, res) => {
 });
 
 app.get("/api/", async (req, res) => {
-  await DeviceHandler.Instance.fetchAll();
   res.json(SensorHandler.Instance.getAll());
 });
 
