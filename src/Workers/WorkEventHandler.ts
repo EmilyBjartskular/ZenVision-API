@@ -1,11 +1,11 @@
 
-export default interface IWorkEvent {
+export interface IWorkEvent {
   on(key: string, handler: { (): void }): void;
 }
 /**
  * Work Events, using the Work interface to manipulates events that have work in its nature, can handle multiple observers
  */
-export default class WorkEventHandler implements IWorkEvent {
+export class WorkEventHandler implements IWorkEvent {
   private handlers: Map<string, [() => void]>;
 
   constructor() {

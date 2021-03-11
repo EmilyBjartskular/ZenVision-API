@@ -1,6 +1,5 @@
 import Work from "./Work";
 
-const axios = require("axios");
 /**
  * Workload, push events and it will run in order of priority
  */
