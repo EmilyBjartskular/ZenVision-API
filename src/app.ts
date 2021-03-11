@@ -1,9 +1,5 @@
-import SensorHandler from "./Sensors/SensorHandler";
 import * as Express from "express";
-import { createServer } from "http";
-import { Socket, Server } from "socket.io";
-import DeviceHandler from "./DeviceHandler";
-import Workload from "./Workers/Workload";
+
 
 const cors = require("cors");
 const dotenv = require("dotenv");
