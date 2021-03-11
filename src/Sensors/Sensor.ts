@@ -48,11 +48,12 @@ export default interface Sensor {
     id: number,
     name: string,
     roomID: number,
+    view?: [any],
     type: string,
     baseType: string,
     enabled: boolean,
     visible: boolean,
-    parentid: number,
+    parentid?: number,
     remoteGatewayId: number,
     viewXml: boolean,
     configXml: boolean,
@@ -60,6 +61,7 @@ export default interface Sensor {
     created: Date,
     modified: Date,
     sortOrder: number,
+    action?: any,
     properties: Properties
 
 }

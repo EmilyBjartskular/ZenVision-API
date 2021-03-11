@@ -25,11 +25,6 @@ export default class SensorHandler {
     public get(id : string): Sensor {
         return this.sensors.get(id);
     }
-    
-    // public getFromId(catagory : string, deviceId : number) {
-    //     const entrys = this.catagories.get(catagory);
-    //     return entrys.find((sensor) => sensor.id === deviceId);
-    // }
 
     public pushItem(id : string, item : Sensor) {
         this.sensors.set(id, item);
