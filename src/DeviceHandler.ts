@@ -14,12 +14,17 @@ dotenv.config();
 export default class DeviceHandler {
   private static instance: DeviceHandler;
   private workHandler: WorkEventHandler;
-  private selected: Work;
-  private workSelected: NodeJS.Timeout;
+  private workSelected?: NodeJS.Timeout;
+  private selectedID: number;s
 
   constructor() {
     this.workHandler = new WorkEventHandler();
+    this.selectedID = 0;
     // setInterval(this.fetchAll, 60 * 1000); //every minute fetch all items
+  }
+
+  public get Selected() : Sensor{
+    return SensorHandler.Instance.get(this.selectedID);
   }
 
   /**
@@ -39,10 +44,10 @@ export default class DeviceHandler {
       selected: false,
       work: async () => {
         const req = await axios(
-          process.env.FIB_ENDPOINT + process.env.PREFIX + "/" + sensor.id
+          process.env.FIB_ENDPOINT + '/api/devices/' + sensor.id
         );
-        const data = req.data;
-        SensorHandler.Instance.updatetem(+data.id, data as Sensor);
+        const data : Sensor = req.data;
+        SensorHandler.Instance.updatetem(+data.id, data);
       },
     };
     return job;
@@ -52,8 +57,9 @@ export default class DeviceHandler {
    * Destroys the selected item
    */
   public unSelect() {
-    this.selected = null;
-    clearInterval(this.workSelected);
+    this.selectedID = 0;
+    if(this.workSelected)
+      clearInterval(this.workSelected);
   }
 
   /**
@@ -61,10 +67,13 @@ export default class DeviceHandler {
    * @param id Device ID
    */
   public selectDevice(id: number) {
-    this.unSelect();
-    this.selected = this.sensorToJob(SensorHandler.Instance.get(id));
-    this.workSelected = setInterval(() => {
-      Workload.Instance.addJob(this.sensorToJob(SensorHandler.Instance.get(id))); 
+    if(this.workSelected)
+      clearInterval(this.workSelected);
+    this.selectedID = id;
+    const job = this.sensorToJob(SensorHandler.Instance.get(id));
+    this.workSelected = setInterval(async () => {
+      await job.work();
+      this.workHandler.run('update')
     }, 500);
   }
 
@@ -75,10 +84,10 @@ export default class DeviceHandler {
   public async fetchAll() {
     try {
       const data = await axios.get(
-        process.env.FIB_ENDPOINT + process.env.PREFIX
+        process.env.FIB_ENDPOINT + '/api/devices'
       );
-      data.data.map(e => {
-        SensorHandler.Instance.setItem(+e.id, e as Sensor);
+      data.data.map((e : Sensor)=> {
+        SensorHandler.Instance.setItem(+e.id, e);
       });
       console.log("fetch order job completed");
     } catch (error) {

@@ -7,6 +7,10 @@ export default class Workload {
   private jobs: Work[]
   private static instance: Workload;
 
+  constructor(){
+    this.jobs = [];
+  }
+
   public static get Instance() {
     if (!this.instance) this.instance = new Workload();
     return this.instance;
@@ -25,13 +29,13 @@ export default class Workload {
    * @param work 
    */
   public addJob(work: Work) {
-    let index = 0
-    this.jobs.map((e, i) => { 
-      if(e.priority > work.priority)
-        index = index < i ? index : i
-    })
-    this.jobs.splice(index, 0, work);
-    
+    // let index = 0
+    // this.jobs.map((e : Work, i: number) => { 
+    //   if(e.priority > work.priority)
+    //     index = index < i ? index : i
+    // })
+    // this.jobs.splice(index, 0, work);
+    this.jobs.push(work);
   }
   
   /**

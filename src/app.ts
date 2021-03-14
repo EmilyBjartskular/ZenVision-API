@@ -1,14 +1,39 @@
-import * as Express from "express";
+import cors from "cors";
+import express, { Application, NextFunction, Request, Response } from "express";
 import control from './routes/control';
 import member from './routes/members'
-const cors = require("cors");
 
-const app = Express();
 
-app.use(Express.json());
-app.use(cors());
+declare interface ResponseError extends Error {
+  status?: number
+}
 
-const logger = (req, res, next) => {
+const app : Application = express();
+
+const options: cors.CorsOptions = {
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'X-Access-Token',
+  ],
+  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+  origin: process.env.API_URL || 'localhost',
+  preflightContinue: false,
+}
+
+app.use(cors(options));
+
+
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: false
+}))
+
+
+
+const logger = (req : Request, res: Response, next : NextFunction) => {
   console.log(
     `${req.protocol}://${req.get("host")}${req.originalUrl}: got  ${req.method}`
   );
@@ -16,9 +41,22 @@ const logger = (req, res, next) => {
 };
 app.use(logger);
 
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+  res.set('Content-Type', 'application/json')
+  next()
+})
+
+app.use((err: ResponseError, req: Request, res: Response, next: NextFunction) => {
+    console.log(err);
+    res.status(err.status || 500);
+    res.send("Error Occured!\nPlease try again later");
+  })
 
 
-app.use('/api/control', control);
+app.use('/api/select', control);
 app.use('/api', member)
 
 export default app;

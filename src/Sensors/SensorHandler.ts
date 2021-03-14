@@ -3,7 +3,6 @@ import Sensor from "./Sensor";
 export default class SensorHandler {
   private static instance: SensorHandler;
   private sensors: Map<number, Sensor>;
-
   constructor() {
     this.sensors = new Map<number, Sensor>();
   }

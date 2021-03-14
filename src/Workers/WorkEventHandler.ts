@@ -21,7 +21,8 @@ export class WorkEventHandler implements IWorkEvent {
   }
 
   public run(key: string) {
-    this.handlers.get(key).map((e) => e());
+    if(this.handlers.has(key))
+      this.handlers.get(key).map((e) => e());
   }
 
   public expose(): IWorkEvent {
