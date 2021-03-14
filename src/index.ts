@@ -10,10 +10,12 @@ DeviceHandler.Instance.fetchAll();
 setInterval(async () => await DeviceHandler.Instance.fetchAll(), 60 * 1000);
 
 const port = process.env.PORT || 5000;
+
+app.set("port", port);
+
 const server = createServer(app);
 const io = new Server(server);
 
-app.set("port", port);
 
 const options = {
   path: "/ws",
@@ -23,6 +25,8 @@ const options = {
 };
 
 io.on("connection", (socket: Socket, options) => {
+  console.log("connection get!")
+
   socket.emit("connected", {message: "Hello World!"})
   socket.on('request device', (id : string)=> {
     DeviceHandler.Instance.selectDevice(+id)
