@@ -2,7 +2,7 @@ import axios from "../node_modules/axios/index"; // just what the fuck
 import Sensor from "./Sensors/Sensor";
 import SensorHandler from "./Sensors/SensorHandler";
 import Work from "./Workers/Work";
-import {WorkEventHandler} from "./Workers/WorkEventHandler";
+import { WorkEventHandler } from "./Workers/WorkEventHandler";
 import Workload from "./Workers/Workload";
 
 const dotenv = require("dotenv");
@@ -13,59 +13,59 @@ dotenv.config();
  */
 export default class DeviceHandler {
   private static instance: DeviceHandler;
-  private enpoints: Work[];//maybe make this to map
   private workHandler: WorkEventHandler;
-  private selected : Work
+  private selected: Work;
   private workSelected: NodeJS.Timeout;
 
-
   constructor() {
-    this.enpoints = [];
     this.workHandler = new WorkEventHandler();
-    setInterval(this.fetchAll, 60 * 1000); //every minute fetch all items 
-   
+    // setInterval(this.fetchAll, 60 * 1000); //every minute fetch all items
   }
 
   /**
-   * Connect to the workhandlers event, this will update every time there is an 
+   * Connect to the workhandlers event, this will update every time there is an
    */
   public get ItemsAvailable() {
     return this.workHandler.expose();
   }
 
-
+  /**
+   * sensorToJob converts sensor object to work object to handle the collection in sensorhandler
+   */
+  public sensorToJob(sensor: Sensor): Work {
+    const job: Work = {
+      id: "" + sensor.id,
+      priority: 5,
+      selected: false,
+      work: async () => {
+        const req = await axios(
+          process.env.FIB_ENDPOINT + process.env.PREFIX + "/" + sensor.id
+        );
+        const data = req.data;
+        SensorHandler.Instance.updatetem(+data.id, data as Sensor);
+      },
+    };
+    return job;
+  }
 
   /**
    * Destroys the selected item
    */
-  public unSelect(){
-      this.enpoints.map(e => e.selected = false)
-      this.selected = null
-      clearInterval(this.workSelected)
+  public unSelect() {
+    this.selected = null;
+    clearInterval(this.workSelected);
   }
 
   /**
    * Select a single device that is going to take priority and worked at a high degree
    * @param id Device ID
    */
-  public selectDevice(id: string) {
-    this.enpoints.map((e) => {
-      if (e.id === id) {
-        e.selected = true;
-        e.priority = 0;
-        this.selected = e
-        this.workSelected = setInterval(() => {
-            if(this.selected){
-                Workload.Instance.addJob(this.selected)
-                this.workHandler.run('update')
-            }
-        }, 500)
-      } else {
-        // make sure all other are 1. unselected 2. more than 0 priority
-        e.selected = false;
-        e.priority += 1;
-      }
-    });
+  public selectDevice(id: number) {
+    this.unSelect();
+    this.selected = this.sensorToJob(SensorHandler.Instance.get(id));
+    this.workSelected = setInterval(() => {
+      Workload.Instance.addJob(this.sensorToJob(SensorHandler.Instance.get(id))); 
+    }, 500);
   }
 
   /**
@@ -77,24 +77,10 @@ export default class DeviceHandler {
       const data = await axios.get(
         process.env.FIB_ENDPOINT + process.env.PREFIX
       );
-      data.data.map((e, i) => {
-        console.log(e);
-        SensorHandler.Instance.pushItem(e.id, e as Sensor);
-        const job: Work = {
-          id: e.id,
-          selected: false,
-          priority: i,
-          work: async () => {
-            const req = await axios(
-              process.env.FIB_ENDPOINT + process.env.PREFIX + "/" + e.id
-            ); 
-            const sensor = req.data;
-            SensorHandler.Instance.updatetem(sensor.id, sensor as Sensor); //todo ensure context is keept because fuck webpackages
-          },
-        };
-        if(!this.enpoints.includes(job)) //this is inefficent, but this will not run at a high degree
-          this.enpoints.push(job);
+      data.data.map(e => {
+        SensorHandler.Instance.setItem(+e.id, e as Sensor);
       });
+      console.log("fetch order job completed");
     } catch (error) {
       console.log(error);
     }

@@ -1,17 +1,19 @@
 import { Router, Request, Response } from "express";
+// import DeviceHandler from "../DeviceHandler";
 import SensorHandler from "../Sensors/SensorHandler";
 
-const router = Router();
-router.get("/api/", async (req: Request, res: Response) => {
+const member = Router();
+member.get("/", async (req: Request, res: Response) => {
+  //   await DeviceHandler.Instance.fetchAll();
   res.json(SensorHandler.Instance.getAll());
 });
 
-router.get("/api/:id", (req: Request, res: Response) => {
-  const id = req.params.id;
-  const entry = SensorHandler.Instance.get(id);
+member.get("/:id", (req: Request, res: Response) => {
+  const id : number = +req.params.id;
+  const entry = SensorHandler.Instance.get(+id);
   if (entry) {
     res.json(entry);
   } else res.status(404).send("not a valid entry!");
 });
 
-export default router;
+export default member;

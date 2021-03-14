@@ -1,36 +1,31 @@
 import Sensor from "./Sensor";
 
 export default class SensorHandler {
+  private static instance: SensorHandler;
+  private sensors: Map<number, Sensor>;
 
+  constructor() {
+    this.sensors = new Map<number, Sensor>();
+  }
 
-    private static instance : SensorHandler;
-    private sensors : Map < string,
-    Sensor >;
+  public static get Instance() {
+    if (!this.instance) this.instance = new SensorHandler();
 
-    constructor() {
-        this.sensors = new Map<string, Sensor>();
-    }
+    return this.instance;
+  }
 
-    public static get Instance() {
-        if (!this.instance) 
-            this.instance = new SensorHandler();
-        
+  public getAll() {
+    return Array.from(this.sensors);
+  }
+  public get(id: number): Sensor {
+    return this.sensors.get(id);
+  }
 
-        return this.instance;
-    }
+  public setItem(id: number, item: Sensor) {
+    this.sensors.set(id, item);
+  }
 
-    public getAll() {
-        return Array.from(this.sensors);
-    }
-    public get(id : string): Sensor {
-        return this.sensors.get(id);
-    }
-
-    public pushItem(id : string, item : Sensor) {
-        this.sensors.set(id, item);
-    }
-    public updatetem(id : string, item : Sensor) {
-        if(this.sensors.has(id))
-            this.sensors.set(id, item);
-    }
+  public updatetem(id: number, item: Sensor) {
+    if (this.sensors.has(id)) this.sensors.set(id, item);
+  }
 }
