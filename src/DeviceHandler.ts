@@ -3,7 +3,6 @@ import Sensor from "./Sensors/Sensor";
 import SensorHandler from "./Sensors/SensorHandler";
 import Work from "./Workers/Work";
 import { WorkEventHandler } from "./Workers/WorkEventHandler";
-import Workload from "./Workers/Workload";
 
 const dotenv = require("dotenv");
 dotenv.config();
