@@ -67,13 +67,24 @@ export default class DeviceHandler {
    * @param id Device ID
    */
   public selectDevice(id: number) {
+    //clear previous selected intervals
     if(this.workSelected)
       clearInterval(this.workSelected);
+
+    //what sensor we are dealing with
     this.selectedID = id;
-    const job = this.sensorToJob(SensorHandler.Instance.get(id));
+    let sensor = SensorHandler.Instance.get(id);
+    //tell the listeners a new selected device have default data
+    this.workHandler.run('update')
+
+    const job = this.sensorToJob(sensor);
     this.workSelected = setInterval(async () => {
       await job.work();
-      this.workHandler.run('update')
+      //if it has a new value update event
+      if(sensor.properties.value !== SensorHandler.Instance.get(id).properties.value){
+        this.workHandler.run('update')
+        sensor = SensorHandler.Instance.get(id)
+      }
     }, 500);
   }
 

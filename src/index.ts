@@ -14,24 +14,25 @@ const port = process.env.PORT || 5000;
 app.set("port", port);
 
 const server = createServer(app);
-const io = new Server(server);
-
 
 const options = {
   path: "/ws",
-  forceNew: true,
-  reconnectionAttempts: 3,
-  timeout: 2000,
+  cors: {
+    credentials: true,
+  },
 };
+const io = new Server(server, options);
 
-io.on("connection", (socket: Socket, options) => {
-  console.log("connection get!")
+io.on("connection", (socket: Socket) => {
+  console.log("connection get!");
 
-  socket.emit("connected", {message: "Hello World!"})
-  socket.on('request device', (id : string)=> {
-    DeviceHandler.Instance.selectDevice(+id)
-  })
-  DeviceHandler.Instance.ItemsAvailable.on('update', () => socket.emit('data', DeviceHandler.Instance.Selected))
+  socket.emit("connected", { message: "Hello World!" });
+  socket.on("request device", (id: string) => {
+    DeviceHandler.Instance.selectDevice(+id);
+  });
+  DeviceHandler.Instance.ItemsAvailable.on("update", () =>
+    socket.emit("data", DeviceHandler.Instance.Selected.properties.value)
+  );
 });
 
 server.listen(app.get("port"), () => {
