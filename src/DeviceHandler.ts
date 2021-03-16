@@ -101,7 +101,7 @@ export default class DeviceHandler {
       });
       console.log("fetch order job completed");
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   }
 

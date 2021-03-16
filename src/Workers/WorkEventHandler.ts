@@ -1,6 +1,7 @@
 
 export interface IWorkEvent {
   on(key: string, handler: { (): void }): void;
+  off(key: string)
 }
 /**
  * Work Events, using the Work interface to manipulates events that have work in its nature, can handle multiple observers
@@ -10,6 +11,10 @@ export class WorkEventHandler implements IWorkEvent {
 
   constructor() {
     this.handlers = new Map<string, [() => void]>();
+  }
+  public off(key: string) {
+    if(this.handlers.has(key))
+      this.handlers.delete(key);
   }
 
   public on(key: string, handler: () => void): void {

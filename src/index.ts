@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { Socket, Server } from "socket.io";
+import * as WebSocket from "ws";
 import DeviceHandler from "./DeviceHandler";
 import app from "./app";
 
@@ -21,18 +21,25 @@ const options = {
     credentials: true,
   },
 };
-const io = new Server(server, options);
 
-io.on("connection", (socket: Socket) => {
-  console.log("connection get!");
+const wss = new WebSocket.Server({ server });
 
-  socket.emit("connected", { message: "Hello World!" });
-  socket.on("request device", (id: string) => {
-    DeviceHandler.Instance.selectDevice(+id);
-  });
+wss.on("connection", (ws) => {
+  console.log("connection");
   DeviceHandler.Instance.ItemsAvailable.on("update", () =>
-    socket.emit("data", DeviceHandler.Instance.Selected.properties.value)
-  );
+  ws.send(JSON.stringify(DeviceHandler.Instance.Selected))
+);
+  ws.on("message", (data) => {
+    console.log(data);
+    DeviceHandler.Instance.selectDevice(+data);
+    
+  });
+
+  ws.on("close", () => {
+    console.log('closed connection')
+    DeviceHandler.Instance.unSelect();
+    DeviceHandler.Instance.ItemsAvailable.off("update");
+  });
 });
 
 server.listen(app.get("port"), () => {
