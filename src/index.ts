@@ -32,28 +32,33 @@ wss.on("connection", (ws) => {
   console.log("connection");
   devices.ItemsAvailable.on("update", () => {
     const selected = devices.Selected;
-    const data: SendFormat = {
-      id: selected.id,
-      name: selected.name,
-      type: selected.type,
-      baseType: selected.baseType,
-      created: selected.created,
-      modifier: selected.modified,
-      batteryLevel: selected.properties.batteryLevel,
-      value: selected.properties.value,
-    };
-    console.log(data.value, "sent to client")
-    ws.send(JSON.stringify(data));
+    if (selected) {
+      //somehow this is run without a selected device
+      const data: SendFormat = {
+        id: selected.id,
+        name: selected.name,
+        type: selected.type,
+        baseType: selected.baseType,
+        created: selected.created,
+        modifier: selected.modified,
+        batteryLevel: selected.properties.batteryLevel,
+        value: selected.properties.value,
+      };
+
+      console.log(data.value, "sent to client");
+      ws.send(JSON.stringify(data));
+    }
   });
+
   ws.on("message", (data) => {
     console.log(data);
-   devices.selectDevice(+data);
+    devices.selectDevice(+data);
   });
 
   ws.on("close", () => {
     console.log("closed connection");
-   devices.unSelect();
-   devices.ItemsAvailable.off("update");
+    devices.unSelect();
+    devices.ItemsAvailable.off("update");
   });
 });
 
