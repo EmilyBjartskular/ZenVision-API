@@ -1,8 +1,7 @@
 import axios from "../node_modules/axios/index"; // just what the fuck
 import Sensor from "./Sensors/Sensor";
 import SensorHandler from "./Sensors/SensorHandler";
-import Work from "./Workers/Work";
-import { WorkEventHandler } from "./Workers/WorkEventHandler";
+import { EventHandler } from "./Events/EventHandler";
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -12,12 +11,12 @@ dotenv.config();
  */
 export default class DeviceHandler {
   private static instance: DeviceHandler;
-  private workHandler: WorkEventHandler;
+  private workHandler: EventHandler;
   private workSelected?: NodeJS.Timeout;
-  private selectedID: number;s
+  private selectedID: number;
 
   constructor() {
-    this.workHandler = new WorkEventHandler();
+    this.workHandler = new EventHandler();
     this.selectedID = 0;
     // setInterval(this.fetchAll, 60 * 1000); //every minute fetch all items
   }
@@ -36,19 +35,14 @@ export default class DeviceHandler {
   /**
    * sensorToJob converts sensor object to work object to handle the collection in sensorhandler
    */
-  public sensorToJob(sensor: Sensor): Work {
-    const job: Work = {
-      id: "" + sensor.id,
-      priority: 5,
-      selected: false,
-      work: async () => {
+  public sensorToJob(sensor: Sensor): (id:number) => Promise<void> {
+    const job = async (id : number) => {
         const req = await axios(
-          process.env.FIB_ENDPOINT + '/api/devices/' + sensor.id
+          process.env.FIB_ENDPOINT + '/api/devices/' + id
         );
         const data : Sensor = req.data;
         SensorHandler.Instance.updatetem(+data.id, data);
-      },
-    };
+      } 
     return job;
   }
 
@@ -59,7 +53,7 @@ export default class DeviceHandler {
     this.selectedID = 0;
     if(this.workSelected)
       clearInterval(this.workSelected);
-  }
+  } 
 
   /**
    * Select a single device that is going to take priority and worked at a high degree
@@ -78,7 +72,7 @@ export default class DeviceHandler {
 
     const job = this.sensorToJob(sensor);
     this.workSelected = setInterval(async () => {
-      await job.work();
+      await job(id);
       //if it has a new value update event
       if(sensor.properties.value !== SensorHandler.Instance.get(id).properties.value){
         this.workHandler.run('update')
