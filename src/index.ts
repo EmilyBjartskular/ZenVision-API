@@ -33,7 +33,6 @@ wss.on("connection", (ws) => {
   devices.ItemsAvailable.on("update", () => {
     const selected = devices.Selected;
     if (selected) {
-      //somehow this is run without a selected device
       const data: SendFormat = {
         id: selected.id,
         name: selected.name,

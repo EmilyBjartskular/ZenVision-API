@@ -60,6 +60,10 @@ export default class DeviceHandler {
    * @param id Device ID
    */
   public selectDevice(id: number) {
+    if(!SensorHandler.Instance.get(id)){
+      return;
+    }
+
     //clear previous selected intervals
     if(this.workSelected)
       clearInterval(this.workSelected);
