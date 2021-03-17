@@ -7,7 +7,8 @@ Meant to be a server hosting sensordata for the following project [ZenVision-Uni
 ability to host multiple selected id´s, smarter use of cached results and better concurrency.
 Utilize Fibaros HC3 Lua scripting to make this api directly observe changes. This was not done because i do not know how as of this writing.
 
-### ===== Websocket protocol =====
+### Websocket protocol
+___
 Sever is simple for now, but to get an device data to update every 500 ms and send it over the socket, send an integer id that will select a device and send the data as is
 
 supported messages : int id
