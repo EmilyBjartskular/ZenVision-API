@@ -13,4 +13,16 @@ Sever is simple for now, but to get an device data to update every 500 ms and se
 
 supported messages : int id
 
-send format: id: number, name: string, type: string, baseType: string, created: Date, modifier: Date, batteryLevel: int, value: string
+send format: 
+```ts
+{
+  id: number, 
+  name: string,
+  type: string,
+  baseType: string, 
+  created: Date,
+  modifier: Date,
+  batteryLevel: int,
+  value: string
+}
+```
