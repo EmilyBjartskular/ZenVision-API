@@ -18,7 +18,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 devices.fetchAll();
-setInterval(async () => await devices.fetchAll(), 60 * 1000);
+// setInterval(async () => await devices.fetchAll(), 60 * 1000);
 
 const port = process.env.PORT || 5000;
 
