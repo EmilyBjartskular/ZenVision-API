@@ -2,7 +2,7 @@ import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
 import control from './routes/control';
 import member from './routes/members'
-
+import type from './routes/type';
 
 declare interface ResponseError extends Error {
   status?: number
@@ -55,8 +55,8 @@ app.use((err: ResponseError, req: Request, res: Response, next: NextFunction) =>
     res.send("Error Occured!\nPlease try again later");
   })
 
-
+app.use('/api', member);
 app.use('/api/select', control);
-app.use('/api', member)
+app.use('/api/type', type);
 
 export default app;

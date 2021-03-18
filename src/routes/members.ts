@@ -14,4 +14,6 @@ member.get("/:id", (req: Request, res: Response) => {
   } else res.status(404).json({message: "not a valid entry!"});
 });
 
+
+
 export default member;
