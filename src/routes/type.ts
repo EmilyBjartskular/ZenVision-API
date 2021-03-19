@@ -25,7 +25,7 @@ type.get("/:id", (req: Request, res: Response) => {
       case "motionSensor":
         stype = SensorType.MotionSensor;
         break;
-      case "doorSensor" || "binarySwitch":
+      case "doorSensor":
         stype = SensorType.DoorSensor;
         break;
       case "lightSensor":
@@ -50,6 +50,6 @@ type.get("/:id", (req: Request, res: Response) => {
         break;
     }
     res.status(200).json({ type: SensorType[stype]});
-  } else res.status(404).json({ message: "no such id", id: id });
+  } else res.status(404).json({ message: "no such member with id", id: id });
 });
 export default type;

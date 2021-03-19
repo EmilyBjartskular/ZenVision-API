@@ -35,7 +35,7 @@ app.use(express.urlencoded({
 
 const logger = (req : Request, res: Response, next : NextFunction) => {
   console.log(
-    `${req.protocol}://${req.get("host")}${req.originalUrl}: got  ${req.method}`
+    `${(new Date()).toISOString()} :${req.protocol}://${req.get("host")}${req.originalUrl}: got  ${req.method}`
   );
   next();
 };
