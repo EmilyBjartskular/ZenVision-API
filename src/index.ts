@@ -31,42 +31,41 @@ const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 let selected: number[] = [];
 wss.on("connection", (ws) => {
-  console.log((new Date()).toISOString(),"connection established");
-
-  const observers = () =>
-    selected.map((id) => {
-      devices.ItemsAvailable.on("update." + id, () => {
-        const selected = SensorHandler.Instance.get(id);
-        if (selected) {
+  console.log(new Date().toISOString(), "connection established");
+  const addObserver = (id : number) =>{
+      const select = SensorHandler.Instance.get(id);
+      if (select) {
+        devices.ItemsAvailable.on("update." + id, () => {
           const data: SendFormat = {
-            id: selected.id,
-            name: selected.name,
-            type: selected.type,
-            baseType: selected.baseType,
-            created: selected.created,
-            modifier: selected.modified,
-            batteryLevel: selected.properties.batteryLevel,
-            value: selected.properties.value,
+            id: select.id,
+            name: select.name,
+            type: select.type,
+            baseType: select.baseType,
+            created: select.created,
+            modifier: select.modified,
+            batteryLevel: select.properties.batteryLevel,
+            value: select.properties.value,
           };
-
           console.log(data.value, "sent to client");
           ws.send(JSON.stringify(data));
-        }
       });
-    });
+      devices.selectDevice(id);
+    }
+  }
 
   ws.on("message", (data) => {
-    console.log((new Date()).toISOString(),data);
+    console.log(new Date().toISOString(), data);
     devices.selectDevice(+data);
     if (!selected.includes(+data)) {
       selected.push(+data);
-      observers();
+      addObserver(+data);
     }
   });
 
   ws.on("close", () => {
-    console.log((new Date()).toISOString(), "closed connection");
+    console.log(new Date().toISOString(), "closed connection");
     selected.map((id) => devices.ItemsAvailable.off("update." + id));
+    selected = []
   });
 });
 
