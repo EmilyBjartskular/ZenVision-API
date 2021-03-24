@@ -2,11 +2,6 @@ import { Router, Request, Response } from "express";
 import Sensor from "../Sensors/Sensor";
 import SensorHandler from "../Sensors/SensorHandler";
 
-declare interface MemberFormat{
-  id? : number,
-  body : Sensor
-}
-
 
 
 const member = Router();
@@ -27,12 +22,12 @@ member.get("/:id", (req: Request, res: Response) => {
 
 member.put("/:id", (req: Request, res: Response) => {
   const id : number = +req.params.id;
-  const entry = handler.get(id);
+  const entry : Sensor= handler.get(id);
   if (entry) {
     try {
-      const data : MemberFormat = req.body;
-      handler.updatetem(id, data.body);
-      res.json({message : `Sensor ${id}, was updated!`, data: data.body});
+      const data : Sensor = req.body;
+      handler.updatetem(id, data);
+      res.json({message : `Sensor ${id}, was updated!`});
 
     } catch (error) {
       res.status(400).json({message: "bad request format", reason: error.message})
@@ -42,10 +37,10 @@ member.put("/:id", (req: Request, res: Response) => {
 
 member.post("/", (req: Request, res: Response) => {
   try {
-    const data : MemberFormat = req.body;
+    const data : Sensor= req.body;
     if(data.id){
-      handler.setItem(data.id, data.body);
-      res.json({message : `Sensor ${data.id}, was updated!`, data: data.body});
+      handler.setItem(data.id, data);
+      res.json({message : `Sensor ${data.id}, was updated!`});
     }else throw "Not a valid ID"
     
   } catch (error) {

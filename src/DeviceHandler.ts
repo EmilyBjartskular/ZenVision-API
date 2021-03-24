@@ -63,6 +63,7 @@ export default class DeviceHandler {
       data.data.map((e : Sensor)=> {
         SensorHandler.Instance.setItem(+e.id, e);
       });
+
       console.log("fetch order job completed");
     } catch (error) {
       console.log(error);
