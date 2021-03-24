@@ -2,6 +2,7 @@ import { createServer } from "http";
 import * as WebSocket from "ws";
 import DeviceHandler from "./DeviceHandler";
 import app from "./app";
+import SensorHandler from "./Sensors/SensorHandler";
 
 declare interface SendFormat {
   id: number;
@@ -26,38 +27,46 @@ app.set("port", port);
 
 const server = createServer(app);
 
+// move http outside and make a new module for ws
 const wss = new WebSocket.Server({ server });
-
+let selected: number[] = [];
 wss.on("connection", (ws) => {
-  console.log("connection");
-  devices.ItemsAvailable.on("update", () => {
-    const selected = devices.Selected;
-    if (selected) {
-      const data: SendFormat = {
-        id: selected.id,
-        name: selected.name,
-        type: selected.type,
-        baseType: selected.baseType,
-        created: selected.created,
-        modifier: selected.modified,
-        batteryLevel: selected.properties.batteryLevel,
-        value: selected.properties.value,
-      };
+  console.log("connection established");
 
-      console.log(data.value, "sent to client");
-      ws.send(JSON.stringify(data));
-    }
-  });
+  const observers = () =>
+    selected.map((id) => {
+      devices.ItemsAvailable.on("update." + id, () => {
+        const selected = SensorHandler.Instance.get(id);
+        if (selected) {
+          const data: SendFormat = {
+            id: selected.id,
+            name: selected.name,
+            type: selected.type,
+            baseType: selected.baseType,
+            created: selected.created,
+            modifier: selected.modified,
+            batteryLevel: selected.properties.batteryLevel,
+            value: selected.properties.value,
+          };
+
+          console.log(data.value, "sent to client");
+          ws.send(JSON.stringify(data));
+        }
+      });
+    });
 
   ws.on("message", (data) => {
     console.log(data);
     devices.selectDevice(+data);
+    if (!selected.includes(+data)) {
+      selected.push(+data);
+      observers();
+    }
   });
 
   ws.on("close", () => {
     console.log("closed connection");
-    devices.unSelect();
-    devices.ItemsAvailable.off("update");
+    selected.map((id) => devices.ItemsAvailable.off("update." + id));
   });
 });
 

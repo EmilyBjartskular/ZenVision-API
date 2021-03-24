@@ -1,10 +1,15 @@
 import axios from "../node_modules/axios/index"; // just what the fuck
 import Sensor from "./Sensors/Sensor";
 import SensorHandler from "./Sensors/SensorHandler";
-import { EventHandler } from "./Events/EventHandler";
+import { EventHandler, IEvent } from "./Events/EventHandler";
 
 const dotenv = require("dotenv");
 dotenv.config();
+// 1. support multiple selections
+// 2. go by the assumption the Fibaro updates this api by posting 
+// 3. Remove polling and simply post to custom event strings
+// 4. post towards fibaro actions ...
+
 
 /**
  * Singleton that fetches, manages and updates devices
@@ -12,17 +17,12 @@ dotenv.config();
 export default class DeviceHandler {
   private static instance: DeviceHandler;
   private workHandler: EventHandler;
-  private workSelected?: NodeJS.Timeout;
-  private selectedID: number;
+  private dataObserver: IEvent;
 
   constructor() {
     this.workHandler = new EventHandler();
-    this.selectedID = 0;
+    this.dataObserver = SensorHandler.Instance.DataUpdate;
     // setInterval(this.fetchAll, 60 * 1000); //every minute fetch all items
-  }
-
-  public get Selected() : Sensor{
-    return SensorHandler.Instance.get(this.selectedID);
   }
 
   /**
@@ -33,56 +33,22 @@ export default class DeviceHandler {
   }
 
   /**
-   * sensorToJob converts sensor object to work object to handle the collection in sensorhandler
-   */
-  public sensorToJob(sensor: Sensor): (id:number) => Promise<void> {
-    const job = async (id : number) => {
-        const req = await axios(
-          process.env.FIB_ENDPOINT + '/api/devices/' + id
-        );
-        const data : Sensor = req.data;
-        SensorHandler.Instance.updatetem(+data.id, data);
-      } 
-    return job;
-  }
-
-  /**
+   * Remove One of the selected items by id
    * Destroys the selected item
    */
-  public unSelect() {
-    this.selectedID = 0;
-    if(this.workSelected)
-      clearInterval(this.workSelected);
+  public unSelect(id: number) {
+    this.dataObserver.off("update."+id);
+
   } 
 
   /**
-   * Select a single device that is going to take priority and worked at a high degree
+   * Select a single device to be observed
    * @param id Device ID
    */
   public selectDevice(id: number) {
-    if(!SensorHandler.Instance.get(id)){
-      return;
-    }
-
-    //clear previous selected intervals
-    if(this.workSelected)
-      clearInterval(this.workSelected);
-
-    //what sensor we are dealing with
-    this.selectedID = id;
-    let sensor = SensorHandler.Instance.get(id);
-    //tell the listeners a new selected device have default data
-    this.workHandler.run('update')
-
-    const job = this.sensorToJob(sensor);
-    this.workSelected = setInterval(async () => {
-      await job(id);
-      //if it has a new value update event
-      if(sensor.properties.value !== SensorHandler.Instance.get(id).properties.value){
-        this.workHandler.run('update')
-        sensor = SensorHandler.Instance.get(id)
-      }
-    }, 500);
+    this.workHandler.run("update."+id); //push latest cached data
+    //todo send request to fibaro or something
+    this.dataObserver.on("update."+id, () => this.workHandler.run("update."+id)); //every time new data is posted on this id we will inform any observer
   }
 
   /**
