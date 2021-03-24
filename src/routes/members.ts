@@ -44,7 +44,7 @@ member.post("/", (req: Request, res: Response) => {
     }else throw "Not a valid ID"
     
   } catch (error) {
-    res.status(400).json({messsage: "Bad format on post request"})  
+        res.status(400).json({messsage: "Bad format on post request"})  
   }
 
 
