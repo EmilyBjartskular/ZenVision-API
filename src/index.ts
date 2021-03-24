@@ -31,7 +31,7 @@ const server = createServer(app);
 const wss = new WebSocket.Server({ server });
 let selected: number[] = [];
 wss.on("connection", (ws) => {
-  console.log("connection established");
+  console.log((new Date()).toISOString(),"connection established");
 
   const observers = () =>
     selected.map((id) => {
@@ -56,7 +56,7 @@ wss.on("connection", (ws) => {
     });
 
   ws.on("message", (data) => {
-    console.log(data);
+    console.log((new Date()).toISOString(),data);
     devices.selectDevice(+data);
     if (!selected.includes(+data)) {
       selected.push(+data);
@@ -65,7 +65,7 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    console.log("closed connection");
+    console.log((new Date()).toISOString(), "closed connection");
     selected.map((id) => devices.ItemsAvailable.off("update." + id));
   });
 });
