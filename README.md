@@ -38,5 +38,5 @@ This is not finished product and does not have a configured production mode
 to run an server instance:
 
 1. run ```npm install ```
-2. generate the .env with valid variable. se [.env.example](https://github.com/Zenvision/ZenVision-API/blob/main/.env.example) for guide.
+2. generate the .env with valid variable. see [.env.example](https://github.com/Zenvision/ZenVision-API/blob/main/.env.example) for guide.
 3. deploy dev: ```npm run dev```
